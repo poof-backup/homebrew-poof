@@ -2,7 +2,8 @@
 
 # +++ constants +++
 
-PACKAGE_NAME="poof==1.3.1"
+PACKAGE_NAME="poof"
+PYPI_URL="https://pypi.org/simple"
 
 
 function die {
@@ -17,20 +18,32 @@ function assertNoVirtualenv {
 
 
 function prepareResourceStanzas {
+    local package
+
     # Ref: https://docs.brew.sh/Python-for-Formula-Authors
     # section Installing.
 
     # cd "$(mktemp -d)"
+    echo "Preparing a virtual environment for making the stanzas..."
     python3 -m venv venv
+
     source venv/bin/activate
+    echo "Virtual environment created at $(pwd)/venv"
 
-    pip install -U pip
+    for package in pip homebrew-pypi-poet "$PACKAGE_NAME"
+    do
+        echo "Installing $package"
+        pip install --index-url "$PYPI_URL" -U "$package"
+    done
 
-    pip install "$PACKAGE_NAME" homebrew-pypi-poet
+    printf "\nPackages installed in virtual environment:\n\n"
+    pip list
+    echo ""
 
-    poet "$PACKAGE_NAME"
-
-    deactivate
+    # Warning about not having the exact version of $PACKAGE_NAME; that requires
+    # a .toml file and that'd have to be maintained in both here and the poof 
+    # package.  Not worth it.
+    poet "$PACKAGE_NAME" 2> /dev/null | tee "resources.rb"
 
     rm -Rf venv
 } # prepareResourceStanzas
