@@ -1,4 +1,4 @@
-class poof < Formula
+class Poof < Formula
   include Language::Python::Virtualenv
 
 
