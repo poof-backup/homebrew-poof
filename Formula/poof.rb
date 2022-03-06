@@ -37,7 +37,7 @@ class Poof < Formula
 
 
   def install
-    virtualenv_install_with_resources
+    virtualenv_install_with_resources:using => "python@3.9"
   end
 end
 
